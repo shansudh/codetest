@@ -9,11 +9,12 @@ sudo mkdir -p /openDS
 buildLDAP
 
 echo " creating group and adding account"
-echo ": techops_dba : ALL" >> /etc/security/access.conf
-echo "%techops_dba  ALL" >> /etc/sudoers
+echo "+ : techops_dba : ALL" >> /etc/security/access.conf
+echo "techops_dba  ALL= ALL" >> /etc/sudoers
 
 echo "To check the NTP Stratum of created host"
 cat /etc/ntp.conf |grep stratum
+ntpq -c rv
 echo "To chek the load on the server"
 uptime |awk '{print $8,$9,$10,$11,$12}'
 

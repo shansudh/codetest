@@ -21,7 +21,7 @@ echo "############################################"
 
 echo "NTP Finding"
 echo "############################################"
-ntpq -p
+ntpq -c rv
 ntpstat
 echo "############################################"
 echo "To check the NTP Stratum of created host"

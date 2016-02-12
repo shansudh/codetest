@@ -1,0 +1,44 @@
+---
+- hosts: codetestsrv001
+  sudo: true
+  vars:
+
+  tasks:
+    - name: ensure openLDAP is installed at latest
+      yum: name={{ item }} state=installed
+      when: ansible_os_family == "RedHat"
+      with_items:
+    - openldap
+    - openldap-servers
+    - openldap-clients
+    - openssh-ldap
+    - pam_ldap
+
+    - name: write the ldap config file
+      template: src=/srv/slapd.conf.j2 dest=/etc/openldap/slapd.conf
+
+    - name: ensure ldap is running (and enable it at boot)
+      service: name=slapd state=started enabled=yes
+
+    - name: ensure the group techops_dba added in to access conf file
+      template: src=/srv/access1.conf.j2 dest=/etc/security/access.conf
+
+    - name: ensure the group techops_dba added in to sudoers file
+      template: src=/srv/sudoers.j2 dest=/etc/sudoers
+
+    - name: check the NTP stratum and load average of the host
+      command: sh srvcheck.sh
+
+- hosts: codetestsrv002
+  sudo: true
+
+  tasks:
+    - name: ensure this config file only allow ssh from codetestsrv001 server
+      template: src=/srv/access2.conf.j2 dest=/etc/security/access.conf
+
+
+  handlers:
+        - name: restart ldap
+          service: name=slapd state=restarted
+        - name: check the server status
+          command: sh ldapmon.sh
